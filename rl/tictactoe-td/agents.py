@@ -1,13 +1,22 @@
+from abc import ABC, abstractmethod
 import game
 import random
 X, O, EMPTY = game.X, game.O, game.EMPTY
 
-class TemporalDifferenceAgent:
-    def __init__(self, alpha = 0.1, epsilon = 0.1, player = X):
+class Agent(ABC):
+    def __init__(self, player):
+        self.player = player
+
+    @abstractmethod
+    def choose(self, board):
+        pass
+
+class TemporalDifferenceAgent(Agent):
+    def __init__(self, player, alpha = 0.1, epsilon = 0.1):
+        super().__init__(player)
         self.value_table = {}
         self.alpha = alpha
         self.epsilon = epsilon
-        self.player = player
 
     def value(self, board) -> float:
         if board not in self.value_table:
@@ -21,7 +30,7 @@ class TemporalDifferenceAgent:
 
         return self.value_table[board]
                 
-    def choose(self, board) -> tuple[int, bool]:
+    def choose(self, board):
         to_explore = random.random() <= self.epsilon
         legal_moves = game.legal_moves(board)
         best_move = -1
@@ -42,3 +51,10 @@ class TemporalDifferenceAgent:
     def update(self, prev_board, next_board):
         self.value_table[prev_board] += self.alpha * (self.value(next_board) - self.value(prev_board))
 
+class RandomAgent(Agent):
+    def __init__(self, player, seed):
+        super().__init__(player)
+        self.random = random.Random(seed)
+
+    def choose(self, board):
+        return self.random.choice(game.legal_moves(board))
