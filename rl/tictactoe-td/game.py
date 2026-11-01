@@ -3,6 +3,17 @@ import numpy as np
 ## Constants
 EMPTY, X, O = 0, 1, -1
 
+WIN_POSITIONS = (
+    (0, 1, 2),
+    (3, 4, 5),
+    (6, 7, 8),
+    (0, 3, 6),
+    (1, 4, 7),
+    (2, 5, 8),
+    (0, 4, 8),
+    (2, 4, 6)
+)
+
 def legal_moves(board) -> list[int]:
     return [i for i in range(9) if board[i] == EMPTY]
 
@@ -12,22 +23,11 @@ def play(board, square, player) -> tuple:
     return tuple(board)
 
 def outcome(board) -> int | None:
-    board = np.array(board).reshape(3, 3)
-    row_summed = np.sum(board, axis = 1)
-    if ((row_summed == 3) | (row_summed == -3)).any():
-        return int(row_summed[np.argmax(np.abs(row_summed))] / 3)
+    for one, two, three in WIN_POSITIONS:
+        if board[one] != EMPTY and board[one] == board[two] and board[two] == board[three]:
+            return board[one]
 
-    col_summed = np.sum(board, axis = 0)
-    if ((col_summed == 3) | (col_summed == -3)).any():
-        return int(col_summed[np.argmax(np.abs(col_summed))] / 3)
+    if EMPTY in board:
+        return None
 
-    diag1_sum = np.trace(board)
-    diag2_sum = np.trace(np.flip(board, axis=1))
-
-    if diag1_sum == 3 or diag1_sum == -3:
-        return int(diag1_sum / 3)
-
-    if diag2_sum == 3 or diag2_sum == -3:
-        return int(diag2_sum / 3)
-
-    return None
+    return 0
