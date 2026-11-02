@@ -1,7 +1,7 @@
 import numpy as np
 
 ## Constants
-EMPTY, X, O = 0, 1, -1
+X, O = 1, -1
 
 WIN_POSITIONS = (
     (0, 1, 2),
@@ -15,7 +15,7 @@ WIN_POSITIONS = (
 )
 
 def legal_moves(board) -> list[int]:
-    return [i for i in range(9) if board[i] == EMPTY]
+    return [i for i in range(9) if board[i] == 0]
 
 def play(board, square, player) -> tuple:
     board = list(board)
@@ -24,10 +24,10 @@ def play(board, square, player) -> tuple:
 
 def outcome(board) -> int | None:
     for one, two, three in WIN_POSITIONS:
-        if board[one] != EMPTY and board[one] == board[two] and board[two] == board[three]:
+        if board[one] != 0 and board[one] == board[two] and board[two] == board[three]:
             return board[one]
 
-    if EMPTY in board:
+    if 0 in board:
         return None
 
     return 0

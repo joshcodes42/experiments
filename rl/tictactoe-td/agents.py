@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import game
 import random
-X, O, EMPTY = game.X, game.O, game.EMPTY
+X, O = game.X, game.O
 
 class Agent(ABC):
     def __init__(self, player):
@@ -23,7 +23,7 @@ class TemporalDifferenceAgent(Agent):
             outcome = game.outcome(board)
             if outcome == self.player:
                 self.value_table[board] = 1
-            elif outcome == -self.player or outcome == EMPTY:
+            elif outcome == -self.player or outcome == 0:
                 self.value_table[board] = 0
             else:
                 self.value_table[board] = 0.5
@@ -31,13 +31,13 @@ class TemporalDifferenceAgent(Agent):
         return self.value_table[board]
                 
     def choose(self, board):
-        to_explore = random.random() <= self.epsilon
+        to_explore = random.random() < self.epsilon
         legal_moves = game.legal_moves(board)
         best_move = -1
 
         if not to_explore: # greedy
             best_val = -1
-
+            random.shuffle(legal_moves)
             for move in legal_moves:
                 val = self.value(game.play(board, move, self.player))
                 if val > best_val:
@@ -49,7 +49,10 @@ class TemporalDifferenceAgent(Agent):
         return best_move, to_explore
 
     def update(self, prev_board, next_board):
-        self.value_table[prev_board] += self.alpha * (self.value(next_board) - self.value(prev_board))
+        prev_value = self.value(prev_board)
+        next_value = self.value(next_board)
+
+        self.value_table[prev_board] += self.alpha * (next_value - prev_value)
 
 class RandomAgent(Agent):
     def __init__(self, player, seed):
