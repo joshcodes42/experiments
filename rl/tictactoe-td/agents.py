@@ -24,7 +24,7 @@ class TemporalDifferenceAgent(Agent):
             outcome = game.outcome(board)
             if outcome == self.player:
                 self.value_table[board] = 1
-            elif outcome == -self.player or outcome == 0:
+            elif outcome == -self.player: # or outcome == 0:
                 self.value_table[board] = 0
             else:
                 self.value_table[board] = 0.5
