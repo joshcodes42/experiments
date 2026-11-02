@@ -12,11 +12,12 @@ class Agent(ABC):
         pass
 
 class TemporalDifferenceAgent(Agent):
-    def __init__(self, player, alpha = 0.1, epsilon = 0.1):
+    def __init__(self, player, alpha = 0.1, epsilon = 0.1, seed = 42):
         super().__init__(player)
         self.value_table = {}
         self.alpha = alpha
         self.epsilon = epsilon
+        self.random = random.Random(seed)
 
     def value(self, board) -> float:
         if board not in self.value_table:
@@ -31,20 +32,20 @@ class TemporalDifferenceAgent(Agent):
         return self.value_table[board]
                 
     def choose(self, board):
-        to_explore = random.random() < self.epsilon
+        to_explore = self.random.random() < self.epsilon
         legal_moves = game.legal_moves(board)
         best_move = -1
 
         if not to_explore: # greedy
             best_val = -1
-            random.shuffle(legal_moves)
+            self.random.shuffle(legal_moves)
             for move in legal_moves:
                 val = self.value(game.play(board, move, self.player))
                 if val > best_val:
                     best_move = move
                     best_val = val
         else:
-            best_move = random.choice(legal_moves)
+            best_move = self.random.choice(legal_moves)
 
         return best_move, to_explore
 
